@@ -161,7 +161,7 @@ Monteriq Bank · Legal Department · 123 Finance Street, Lagos, Nigeria.</p>
         if (!document.querySelector('link[href*="legal.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = '/public/css/legal.css';
+            link.href = '/css/legal.css';
             document.head.appendChild(link);
         }
 

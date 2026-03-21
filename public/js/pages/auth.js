@@ -51,7 +51,6 @@ function bindEvents() {
         if (icon) icon.className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
     });
 
-    // Close modal when clicking the dark backdrop
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
             closeModal(e.target.id);
@@ -71,11 +70,13 @@ function bindEvents() {
 window.openModal = function(id) {
     const m = document.getElementById(id);
     if (!m) { console.error('Modal not found:', id); return; }
-    // Dim the login card
     document.getElementById('authContainer').style.opacity = '0.3';
     document.getElementById('authContainer').style.pointerEvents = 'none';
     m.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Build phrase grid when forgot modal opens
+    if (id === 'forgotModal') { resetForgotForm(); buildAuthPhraseGrid(); }
 };
 
 window.closeModal = function(id) {
@@ -86,15 +87,13 @@ window.closeModal = function(id) {
     document.getElementById('authContainer').style.pointerEvents = 'auto';
     document.body.style.overflow = '';
 
-    // Reset form state on close
     if (id === 'individualModal')  resetIndividualForm();
     if (id === 'jointModal')       resetJointForm();
     if (id === 'secondUserModal')  resetSecondUserForm();
-    if (id === 'forgotModal') { resetForgotForm(); buildAuthPhraseGrid(); }
+    if (id === 'forgotModal')      resetForgotForm();
     if (id === 'otpVerifyModal')   document.getElementById('otpInput').value = '';
 };
 
-// Keep old names working in case any onclick still uses them
 window.showModal = window.openModal;
 window.hideModal = window.closeModal;
 
@@ -110,9 +109,7 @@ window.openJointForm = function() {
 };
 window.showJointForm = window.openJointForm;
 
-function changeLanguage(lang) {
-    console.log('Language:', lang);
-}
+function changeLanguage(lang) { console.log('Language:', lang); }
 
 // ── LOGIN ─────────────────────────────────────
 
@@ -124,8 +121,7 @@ async function handleLogin(e) {
 
     const email    = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-
-    const result = await Auth.login(email, password);
+    const result   = await Auth.login(email, password);
 
     if (result.success) {
         window.location.href = '/dashboard.html';
@@ -182,24 +178,21 @@ window.prevIndividualStep = function() { setStepUI(2, 1); };
 function setStepUI(from, to) {
     document.getElementById('individualStep' + from).classList.remove('active');
     document.getElementById('individualStep' + to).classList.add('active');
-
-    // Update dots
-    const dots = document.querySelectorAll('#individualModal .step');
-    dots.forEach((d, i) => {
+    document.querySelectorAll('#individualModal .step').forEach((d, i) => {
         d.classList.remove('active', 'completed');
-        if (i + 1 < to) d.classList.add('completed');
+        if (i + 1 < to)  d.classList.add('completed');
         if (i + 1 === to) d.classList.add('active');
     });
 }
 
 function validateStep1() {
-    const f = id => document.getElementById(id)?.value || '';
+    const f  = id => document.getElementById(id)?.value || '';
     const fn = f('indFirstName'), ln = f('indLastName'), em = f('indEmail'),
-          pw = f('indPassword'), cf = f('indConfirm'),
-          bd = f('indBirthDate'), gn = f('indGender'), co = f('indCountry');
+          pw = f('indPassword'),  cf = f('indConfirm'),
+          bd = f('indBirthDate'), gn = f('indGender'),   co = f('indCountry');
     if (!fn||!ln||!em||!pw||!cf||!bd||!gn||!co) { alert('Please fill in all fields'); return false; }
-    if (pw.length < 8)   { alert('Password must be at least 8 characters'); return false; }
-    if (pw !== cf)        { alert('Passwords do not match'); return false; }
+    if (pw.length < 8)    { alert('Password must be at least 8 characters'); return false; }
+    if (pw !== cf)         { alert('Passwords do not match'); return false; }
     if (!em.includes('@')) { alert('Please enter a valid email'); return false; }
     return true;
 }
@@ -217,7 +210,6 @@ window.processIndividualSignup = async function() {
     const result = await Auth.signUpIndividual(individualData);
 
     if (result.success) {
-        // Move to step 3
         document.getElementById('individualStep2').classList.remove('active');
         document.getElementById('individualStep3').style.display = 'block';
         document.getElementById('indRecoveryPhrase').textContent = result.recoveryPhrase;
@@ -245,19 +237,15 @@ function resetIndividualForm() {
     });
     clearUpload('govId');
     clearUpload('profilePic');
-
     document.getElementById('individualStep1').classList.add('active');
     document.getElementById('individualStep2').classList.remove('active');
     document.getElementById('individualStep3').style.display = 'none';
-
     document.querySelectorAll('#individualModal .step').forEach((d, i) => {
         d.classList.toggle('active', i === 0);
         d.classList.remove('completed');
     });
-
     const btn = document.getElementById('indCompleteBtn');
     if (btn) { btn.disabled = false; btn.innerHTML = 'Complete'; }
-
     individualData = {};
 }
 
@@ -268,15 +256,13 @@ async function handleJointSubmit(e) {
 
     const pass1 = document.getElementById('jointPass1').value;
     const conf1 = document.getElementById('jointConfirm1').value;
-    if (pass1 !== conf1) { alert('Passwords do not match'); return; }
+    if (pass1 !== conf1)  { alert('Passwords do not match'); return; }
     if (pass1.length < 8) { alert('Password must be at least 8 characters'); return; }
 
     const required = ['jointFirst1','jointLast1','jointEmail1','jointBirth1',
                       'jointGender1','jointCountry1','jointEmail2'];
     for (const id of required) {
-        if (!document.getElementById(id)?.value) {
-            alert('Please fill in all fields'); return;
-        }
+        if (!document.getElementById(id)?.value) { alert('Please fill in all fields'); return; }
     }
 
     if (!document.getElementById('jointId1Url').value)  { alert('Please upload your government ID'); return; }
@@ -303,13 +289,11 @@ async function handleJointSubmit(e) {
     const result = await Auth.initJointAccount(primaryData);
 
     if (result.success) {
-        // Show OTP screen
         document.getElementById('jointFormWrapper').style.display = 'none';
         document.getElementById('otpDisplay').style.display       = 'block';
         document.getElementById('jointOtp').textContent           = result.otp;
         document.getElementById('primaryPhrase').textContent      = result.recoveryPhrase;
 
-        // Insert instruction box before OTP
         const info = document.createElement('div');
         info.className = 'alert alert-info';
         info.style.marginBottom = '16px';
@@ -333,7 +317,6 @@ function resetJointForm() {
     clearUpload('jointPic1');
     document.getElementById('jointFormWrapper').style.display = 'block';
     document.getElementById('otpDisplay').style.display       = 'none';
-    // Remove any injected info boxes
     document.querySelectorAll('#otpDisplay .alert-info').forEach(el => el.remove());
     const btn = document.getElementById('jointSubmitBtn');
     if (btn) { btn.disabled = false; btn.innerHTML = 'Create Account &amp; Get OTP'; }
@@ -409,7 +392,7 @@ async function handleSecondUserSubmit(e) {
         profilePicture: document.getElementById('secondProfilePicUrl').value
     };
 
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn  = e.target.querySelector('button[type="submit"]');
     const orig = btn?.innerHTML;
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing registration…'; }
 
@@ -439,17 +422,14 @@ function resetSecondUserForm() {
 // ── GO TO DASHBOARD ───────────────────────────
 
 window.goToDashboard = function() {
-    // Only check the checkbox that is actually visible right now
     const boxes = ['indConfirmSave', 'primaryConfirmSave', 'secondConfirmSave'];
     for (const id of boxes) {
         const el = document.getElementById(id);
-        // offsetParent is null when el or any ancestor is display:none
         if (el && el.offsetParent !== null && !el.checked) {
             alert('Please confirm you have saved your recovery phrase');
             return;
         }
     }
-    // Disable button immediately to prevent double-click
     const btn = event?.target;
     if (btn?.tagName === 'BUTTON') {
         btn.disabled = true;
@@ -461,13 +441,13 @@ window.goToDashboard = function() {
 // ── FORGOT PASSWORD ───────────────────────────
 
 window.verifyPhrase = async function() {
-    var email = (document.getElementById('resetEmail') || {}).value.trim();
-    var words = getAuthPhraseWords();
-    var phrase = words.join(' ').trim();
-    if (!email)  { alert('Please enter your email'); return; }
-    if (words.some(function(w){return !w;})) { alert('Please fill in all 12 recovery words'); return; }
+    const email  = (document.getElementById('resetEmail') || {}).value.trim();
+    const words  = getAuthPhraseWords();
+    const phrase = words.join(' ').trim();
+    if (!email)              { alert('Please enter your email'); return; }
+    if (words.some(w => !w)) { alert('Please fill in all 12 recovery words'); return; }
 
-    var result = await Auth.verifyRecoveryPhrase(email, phrase);
+    const result = await Auth.verifyRecoveryPhrase(email, phrase);
     if (result.success) {
         resetToken = result.resetToken;
         document.getElementById('forgotStep1').style.display = 'none';
@@ -539,10 +519,7 @@ function handleFile(file, id) {
         alert(isPic ? 'Please upload a JPG or PNG image' : 'Please upload a JPG, PNG or PDF');
         return;
     }
-    if (file.size > maxSize) {
-        alert(`File must be under ${maxSize / 1048576}MB`);
-        return;
-    }
+    if (file.size > maxSize) { alert(`File must be under ${maxSize / 1048576}MB`); return; }
     showPreview(file, id);
     uploadToCloudinary(file, id);
 }
@@ -551,9 +528,7 @@ function showPreview(file, id) {
     const preview = document.getElementById(id + 'Preview');
     const textEl  = document.getElementById(id + 'Text');
     if (!preview) return;
-
     if (textEl) textEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing…';
-
     const reader = new FileReader();
     reader.onload = (e) => {
         preview.innerHTML = `
@@ -593,12 +568,11 @@ function uploadToCloudinary(file, id) {
 
     xhr.onload = () => {
         if (xhr.status === 200) {
-            const url = JSON.parse(xhr.responseText).secure_url;
+            const url    = JSON.parse(xhr.responseText).secure_url;
             const hidden = document.getElementById(id + 'Url');
             if (hidden) hidden.value = url;
-            // Mark done
-            const bar = document.querySelector(`#${id}Bar .progress-bar`);
-            const txt = document.getElementById(id + 'Pct');
+            const bar    = document.querySelector(`#${id}Bar .progress-bar`);
+            const txt    = document.getElementById(id + 'Pct');
             const textEl = document.getElementById(id + 'Text');
             if (bar) { bar.style.width = '100%'; bar.style.background = 'var(--success)'; }
             if (txt) txt.innerHTML = `<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Done!</span><span>100%</span>`;
@@ -614,9 +588,9 @@ function uploadToCloudinary(file, id) {
 }
 
 function uploadError(id) {
-    const txt = document.getElementById(id + 'Pct');
-    if (txt) txt.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-circle"></i> Upload failed</span>';
+    const txt    = document.getElementById(id + 'Pct');
     const textEl = document.getElementById(id + 'Text');
+    if (txt)    txt.innerHTML = '<span style="color:var(--error)"><i class="fas fa-exclamation-circle"></i> Upload failed</span>';
     if (textEl) { textEl.style.display = 'block'; textEl.textContent = 'Click to try again'; }
 }
 
@@ -632,46 +606,43 @@ window.removeUpload = function(id) {
     }
 };
 
-function clearUpload(id) {
-    window.removeUpload(id);
-}
+function clearUpload(id) { window.removeUpload(id); }
 
 function fmtSize(b) {
-    if (b < 1024) return b + ' B';
-    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
-    return (b/1048576).toFixed(1) + ' MB';
+    if (b < 1024)    return b + ' B';
+    if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1048576).toFixed(1) + ' MB';
 }
 
-// ── AUTH PHRASE GRID HELPERS ─────────────────
+// ── AUTH PHRASE GRID ──────────────────────────
 
 function buildAuthPhraseGrid() {
-    var container = document.getElementById('forgotPhraseGrid');
+    const container = document.getElementById('forgotPhraseGrid');
     if (!container) return;
-    var html = '';
-    for (var i = 1; i <= 12; i++) {
-        html += '<div class="phrase-cell">'
-            + '<span class="phrase-num">' + i + '</span>'
-            + '<input type="text" id="authPhrase_' + i + '" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="word" '
-            + 'onkeydown="authPhraseNav(event,' + i + ')">'
-            + '</div>';
+    let html = '';
+    for (let i = 1; i <= 12; i++) {
+        html += `<div class="phrase-cell">
+            <span class="phrase-num">${i}</span>
+            <input type="text" id="authPhrase_${i}" autocomplete="off"
+                spellcheck="false" autocorrect="off" autocapitalize="off"
+                placeholder="word" onkeydown="authPhraseNav(event,${i})">
+        </div>`;
     }
     container.innerHTML = html;
-    var first = document.getElementById('authPhrase_1');
-    if (first) setTimeout(function () { first.focus(); }, 100);
+    setTimeout(() => document.getElementById('authPhrase_1')?.focus(), 100);
 }
 
 function authPhraseNav(e, idx) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault();
-        var next = document.getElementById('authPhrase_' + (idx + 1));
-        if (next) next.focus();
+        document.getElementById('authPhrase_' + (idx + 1))?.focus();
     }
 }
 
 function getAuthPhraseWords() {
-    var words = [];
-    for (var i = 1; i <= 12; i++) {
-        var el = document.getElementById('authPhrase_' + i);
+    const words = [];
+    for (let i = 1; i <= 12; i++) {
+        const el = document.getElementById('authPhrase_' + i);
         words.push(el ? el.value.trim().toLowerCase() : '');
     }
     return words;

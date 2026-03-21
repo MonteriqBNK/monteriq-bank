@@ -3,12 +3,42 @@
 // ============================================
 
 const US_BANKS = [
-    "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank",
-    "U.S. Bank", "Truist Bank", "PNC Bank", "TD Bank", "Capital One",
-    "Charles Schwab Bank", "Goldman Sachs Bank", "Morgan Stanley Bank",
-    "HSBC Bank USA", "American Express Bank", "Ally Bank", "Discover Bank",
-    "Synchrony Bank", "Barclays Bank US", "BMO Harris Bank", "Citizens Bank",
-    "Fifth Third Bank", "KeyBank", "M&T Bank", "Regions Bank", "Huntington Bank"
+  "JPMorgan Chase","Bank of America","Wells Fargo","Citibank",
+  "U.S. Bank","Truist Bank","PNC Bank","TD Bank","Capital One",
+  "Charles Schwab Bank","Goldman Sachs Bank","Morgan Stanley Bank",
+  "HSBC Bank USA","American Express Bank","Ally Bank","Discover Bank",
+  "Synchrony Bank","Barclays Bank US","BMO Harris Bank","Citizens Bank",
+  "Fifth Third Bank","KeyBank","M&T Bank","Regions Bank","Huntington Bank",
+
+  "First Republic Bank","Silicon Valley Bank","Signature Bank",
+  "Comerica Bank","Zions Bank","First Horizon Bank","East West Bank",
+  "Western Alliance Bank","Popular Bank","BankUnited","New York Community Bank",
+  "First Citizens Bank","Webster Bank","Frost Bank","Old National Bank",
+  "South State Bank","UMB Bank","Valley National Bank","Associated Bank",
+  "Prosperity Bank","Texas Capital Bank","Wintrust Bank","United Bank",
+  "Glacier Bank","Atlantic Union Bank","First Interstate Bank",
+  "Pinnacle Bank","FirstBank","Banner Bank","Pacific Premier Bank",
+  "Customers Bank","Cathay Bank","Hanmi Bank","Hope Bank",
+  "Lakeland Bank","Sterling National Bank","Bank OZK",
+  "Arvest Bank","BancorpSouth Bank","MidFirst Bank",
+  "Commerce Bank","First Financial Bank","United Community Bank",
+  "Trustmark Bank","Simmons Bank","Renasant Bank",
+  "Independent Bank","ServisFirst Bank","First Midwest Bank",
+  "Great Western Bank","Central Bank","TowneBank",
+  "NBH Bank","Origin Bank","Heritage Bank",
+  "Columbia Bank","Fulton Bank","WSFS Bank",
+  "Seacoast Bank","Ameris Bank","Berkshire Bank",
+  "Old Second Bank","Park National Bank","Stock Yards Bank",
+  "First Merchants Bank","Horizon Bank","Peoples Bank",
+  "United Bankshares","Farmers National Bank","City National Bank",
+  "Bank of Hawaii","First Hawaiian Bank","Central Pacific Bank",
+  "Bank of the West","MUFG Union Bank","Rabobank NA",
+  "First National Bank of America","First National Bank Texas",
+  "First National Bank Alaska","First National Bank of Omaha",
+  "First National Bank","City Bank","Flagstar Bank",
+  "Axos Bank","Live Oak Bank","Quontic Bank",
+  "Cross River Bank","Green Dot Bank","Varo Bank",
+  "Current Bank","Chime Bank"
 ];
 
 // ============================================

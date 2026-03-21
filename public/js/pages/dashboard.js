@@ -1248,7 +1248,7 @@ function toggleTheme() {
     if (icon) icon.className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
 }
 
-// Language switching handled by /js/components/languageSwitcher.js
+// Language switching handled by /public/js/components/languageSwitcher.js
 
 // Apply saved theme immediately
 const savedTheme = localStorage.getItem('theme') || 'light';

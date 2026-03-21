@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monteriq Bank - Authentication</title>
+    <title>Monteriq Bank - Dashboard</title>
     
     <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content="Monteriq Bank">
@@ -23,15 +23,178 @@
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dcudfj0sm/image/upload/v1774079843/monteriqfavicon_h2htpp.png">
     <link rel="apple-touch-icon" href="https://res.cloudinary.com/dcudfj0sm/image/upload/v1774079843/monteriqfavicon_h2htpp.png">
     
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/utilities.css">
     <link rel="stylesheet" href="/css/theme.css">
-    <link rel="stylesheet" href="/css/pages/auth.css">
-    <link rel="stylesheet" href="/public/css/pages/dashboard.css">
+    <link rel="stylesheet" href="/css/send-receive.css">
+    <link rel="stylesheet" href="/css/transactions.css">
+    <link rel="stylesheet" href="/css/pages/dashboard.css">
+    <link rel="stylesheet" href="/css/cards.css">
+    <link rel="stylesheet" href="/css/loan.css">
+    <link rel="stylesheet" href="/css/investment.css">
+    <link rel="stylesheet" href="/css/notification.css">
+    <style>
+        /* ── Phrase grid shared style ── */
+        .phrase-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .phrase-grid .phrase-cell {
+            position: relative;
+        }
+        .phrase-grid .phrase-num {
+            position: absolute;
+            top: 4px; left: 6px;
+            font-size: .6rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+            line-height: 1;
+        }
+        .phrase-grid input {
+            width: 100%;
+            padding: 18px 6px 6px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: .8rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .phrase-grid input:focus {
+            border-color: var(--accent-primary);
+            background: var(--bg-primary);
+        }
+    </style>
+    
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* ---- Navbar avatar button ---- */
+        .nav-user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px 4px 4px;
+            border: 1px solid var(--border, #e5e7eb);
+            border-radius: 999px;
+            background: var(--bg-secondary, #f9fafb);
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary, #111827);
+        }
+
+        .nav-user-btn:hover {
+            border-color: var(--accent-primary, #2563eb);
+            background: var(--bg-primary, #fff);
+        }
+
+        #navAvatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--border, #e5e7eb);
+        }
+
+        /* ---- Dropdown enhancements ---- */
+        .dropdown-user-info {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border, #e5e7eb);
+            pointer-events: none;
+        }
+
+        .dropdown-user-info .dui-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary, #111827);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        .dropdown-user-info .dui-email {
+            font-size: 0.78rem;
+            color: var(--text-secondary, #6b7280);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+            margin-top: 2px;
+        }
+
+        .dropdown-item.logout {
+            color: var(--error, #dc2626);
+        }
+
+        .dropdown-item.logout:hover {
+            background: #fee2e2;
+        }
+
+        /* ---- Dropdown visibility fix ---- */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            background: var(--bg-primary, #ffffff);
+            border: 1px solid var(--border, #e5e7eb);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            color: var(--text-primary, #111827);
+            text-decoration: none;
+            transition: background 0.1s;
+            cursor: pointer;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: var(--bg-secondary, #f9fafb);
+        }
+
+        .dropdown-menu .dropdown-divider {
+            height: 1px;
+            background: var(--border, #e5e7eb);
+            margin: 4px 0;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
